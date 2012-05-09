@@ -1,4 +1,5 @@
 /*
+ *  Methods for simple XML document generator and printer
  *  (C)Copyright RW Penney 2012
  */
 
@@ -7,8 +8,19 @@
 
 namespace minixml {
 
-BareNode::BareNode(const std::string &ident_)
-    : ident(ident_)
+/*
+ *  ==== BareNode ====
+ */
+
+BareNode::BareNode(const std::string &name_)
+    : name(name_)
+{
+    // Nothing else
+}
+
+
+BareNode::BareNode(const BareNode &other)
+    : name(other.name)
 {
     // Nothing else
 }
@@ -61,8 +73,8 @@ Attribute::~Attribute()
  *  ==== Node ====
  */
 
-Node::Node(Document *doc, const std::string &ident_)
-    : BareNode(ident_), theDoc(doc)
+Node::Node(Document *doc, const std::string &name_)
+    : BareNode(name_), theDoc(doc)
 {
     // Nothing else
 }
@@ -77,14 +89,21 @@ Node::~Node()
 }
 
 
+template <>
+void Node::AddAttribute(const std::string &name, const std::string &value)
+{
+    attributes.push_back(Attribute(name, value));
+}
+
+
 void Node::AddAttribute(const std::string &name, const char *value)
 {
     attributes.push_back(Attribute(name, value));
 }
 
 
-Node *Node::PrependChild(const std::string &ident_)
-{   Node *newnode = new Node(theDoc, ident_);
+Node *Node::PrependChild(const std::string &name_)
+{   Node *newnode = new Node(theDoc, name_);
 
     children.push_front(newnode);
 
@@ -92,8 +111,8 @@ Node *Node::PrependChild(const std::string &ident_)
 }
 
 
-Node *Node::AppendChild(const std::string &ident_)
-{   Node *newnode = new Node(theDoc, ident_);
+Node *Node::AppendChild(const std::string &name_)
+{   Node *newnode = new Node(theDoc, name_);
 
     children.push_back(newnode);
 
@@ -101,17 +120,26 @@ Node *Node::AppendChild(const std::string &ident_)
 }
 
 
+void Node::AppendText(const std::string &txt)
+{
+    children.push_back(new TextNode(txt));
+}
+
+
+/*!
+ *  Recursively pretty-print this element and its children.
+ */
 void Node::Output(std::ostream &strm, const std::string &indent,
-                    const std::string &indentStep)
+                    const std::string &indentStep) const
 {   std::list<Attribute>::const_iterator attr;
     std::list<BareNode*>::const_iterator child;
     const std::string attIndent = indent + "    ";
     size_t attLen = 0;
 
-    strm << indent << "<" << ident;
+    strm << indent << "<" << name;
 
     for (attr=attributes.begin(); attr!=attributes.end(); ++attr) {
-        if (attLen > 40) {
+        if (attLen > theDoc->attrWidth) {
             strm << std::endl << attIndent;
             attLen = 0;
         } else {
@@ -119,18 +147,27 @@ void Node::Output(std::ostream &strm, const std::string &indent,
         }
         strm << attr->key << "=\"" << attr->value << "\"";
 
-        attLen += attr->length;
+        attLen += attr->length + 3;
     }
 
     if (!children.empty()) {
-        strm << ">" << std::endl;
-
         const std::string childIndent = indent + indentStep;
+        bool EOLdue = true;
+
+        strm << ">";
 
         for (child=children.begin(); child!=children.end(); ++child) {
-            (*child)->Output(strm, childIndent, indentStep);
+            const BareNode &nd = (**child);
+
+            if (EOLdue && !nd.InLine()) strm << std::endl;
+
+            nd.Output(strm, childIndent, indentStep);
+
+            EOLdue = nd.InLine();
         }
-        strm << indent << "</" << ident << ">" << std::endl;
+
+        if (!EOLdue) strm << indent;
+        strm << "</" << name << ">" << std::endl;
     } else {
         strm << "/>" << std::endl;
     }
@@ -139,12 +176,35 @@ void Node::Output(std::ostream &strm, const std::string &indent,
 
 
 /*
+ *  ==== TextNode ====
+ */
+
+TextNode::TextNode(const std::string &content_)
+    : BareNode("TEXT"), content(content_)
+{
+}
+
+
+TextNode::~TextNode()
+{
+}
+
+
+void TextNode::Output(std::ostream &strm, const std::string &name,
+                        const std::string &indentStep) const
+{
+    strm << content;
+}
+
+
+/*
  *  ==== Document ====
  */
 
-Document::Document(const std::string &ident_)
-    : Node(this, ident_)
+Document::Document(const std::string &root)
+    : Node(this, root)
 {
+    attrWidth = 40;
 }
 
 
@@ -165,7 +225,7 @@ void Document::Print(std::ostream &strm, const std::string &indent)
 }   // namespace minixml
 
 
-#if 1
+#ifdef DEMO_MAIN
 
 using namespace minixml;
 
@@ -180,6 +240,7 @@ int main(int argc, char *argv[])
     nd0->AppendChild("alpha_2");
     nd1 = doc.AppendChild("Beta");
     nd2 = nd1->AppendChild("beta_0");
+    nd2->AppendText("Possibly");
     nd2->AddAttribute("float", 2 / 3.0f);
     nd2->AddAttribute("int", -34);
     nd2->AddAttribute("string", std::string("bother"));
@@ -188,10 +249,11 @@ int main(int argc, char *argv[])
     nd2->AddAttribute("attribute3", 1<<30);
     nd2->AppendChild("beta_0_0");
     nd2 = doc.AppendChild("Gamma");
+    nd2->AppendText("Rainfall in Spain favours small gradients");
 
     doc.Print(std::cout);
 
     return 0;
 }
 
-#endif
+#endif  // DEMO_MAIN
