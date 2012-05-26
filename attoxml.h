@@ -3,8 +3,8 @@
  *  (C)Copyright RW Penney 2012
  */
 
-#ifndef _MINIXML_H
-#define _MINIXML_H
+#ifndef _ATTOXML_H
+#define _ATTOXML_H
 
 #include <iostream>
 #include <list>
@@ -12,7 +12,7 @@
 #include <string>
 
 
-namespace minixml {
+namespace attoxml {
 
 class Document;
 
@@ -97,7 +97,9 @@ class Node : public BareNode
         //! The top-level document to which this Node belongs
         Document *theDoc;
 
-        std::list<Attribute> attributes;
+        typedef std::list<Attribute> AttrList;
+
+        AttrList attributes;
         std::list<BareNode*> children;
 };
 
@@ -133,6 +135,9 @@ class Document : public Node
         Document(const std::string &root);
         ~Document();
 
+        //! Specify the default XML namespace for the document
+        void SetDefaultNS(const std::string &xmlns);
+
         void Print(std::ostream &strm, const std::string &indent="  ");
 
     protected:
@@ -143,6 +148,9 @@ class Document : public Node
         //! Nominal width of page allowed for each line of attributes
         size_t attrWidth;
 
+        //! Location within the list of attributes
+        //! of any current default namespace declaration
+        AttrList::iterator *nsDecl;
 
     friend class Node;
 };
@@ -158,6 +166,6 @@ void Node::AddAttribute(const std::string &name, const VAL_T &value)
     attributes.push_back(Attribute(name, theDoc->attrStrm.str()));
 }
 
-}   // namespace minixml
+}   // namespace attoxml
 
-#endif  /* !_MINIXML_H */
+#endif  /* !_ATTOXML_H */

@@ -3,10 +3,10 @@
  *  (C)Copyright RW Penney 2012
  */
 
-#include "minixml.h"
+#include "attoxml.h"
 
 
-namespace minixml {
+namespace attoxml {
 
 /*
  *  ==== BareNode ====
@@ -131,7 +131,7 @@ void Node::AppendText(const std::string &txt)
  */
 void Node::Output(std::ostream &strm, const std::string &indent,
                     const std::string &indentStep) const
-{   std::list<Attribute>::const_iterator attr;
+{   AttrList::const_iterator attr;
     std::list<BareNode*>::const_iterator child;
     const std::string attIndent = indent + "    ";
     size_t attLen = 0;
@@ -205,12 +205,26 @@ Document::Document(const std::string &root)
     : Node(this, root)
 {
     attrWidth = 40;
+    nsDecl = NULL;
 }
 
 
 Document::~Document()
 {
-    // Nothing
+    if (nsDecl != NULL) delete nsDecl;
+}
+
+
+void Document::SetDefaultNS(const std::string &xmlns)
+{
+    if (nsDecl != NULL) {
+        attributes.erase(*nsDecl);
+        delete nsDecl;
+    }
+
+    const AttrList::iterator attrLocation = attributes.insert(attributes.end(),
+                                                    Attribute("xmlns", xmlns));
+    nsDecl = new AttrList::iterator(attrLocation);
 }
 
 
@@ -222,23 +236,28 @@ void Document::Print(std::ostream &strm, const std::string &indent)
     Output(strm, "", indent);
 }
 
-}   // namespace minixml
+}   // namespace attoxml
 
 
-#ifdef DEMO_MAIN
+#ifdef ATTO_DEMO_MAIN
 
-using namespace minixml;
+using namespace attoxml;
 
 int main(int argc, char *argv[])
 {   Document doc("TopNode");
     Node *nd0, *nd1, *nd2;
 
+    doc.SetDefaultNS("http://pmcyg.sourceforge.net");
+    doc.AddAttribute("timestamp", "01Jan1970");
+
     nd0 = doc.AppendChild("Alpha");
     nd0->AddAttribute("double", 1.72);
+    nd0->AddAttribute("ident", "d44c8ba0d2d2");
     nd0->AppendChild("alpha_0");
     nd0->AppendChild("alpha_1");
     nd0->AppendChild("alpha_2");
     nd1 = doc.AppendChild("Beta");
+    nd1->AddAttribute("ident", "d2cf30339783");
     nd2 = nd1->AppendChild("beta_0");
     nd2->AppendText("Possibly");
     nd2->AddAttribute("float", 2 / 3.0f);
@@ -256,4 +275,4 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-#endif  // DEMO_MAIN
+#endif  // ATTO_DEMO_MAIN
