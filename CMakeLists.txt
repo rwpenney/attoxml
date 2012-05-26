@@ -19,7 +19,7 @@ SET(lib_srcs
     attoxml.cpp
 )
 
-SET(EXTRA_DIST CMakeLists.txt)
+SET(EXTRA_DIST CMakeLists.txt LICENSE.txt)
 
 
 ADD_LIBRARY(attoxml STATIC ${lib_hdrs} ${lib_srcs})
