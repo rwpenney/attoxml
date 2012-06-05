@@ -2,7 +2,7 @@
 # RW Penney, May 2012
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-SET(ATTO_VERSION "0.1")
+SET(ATTO_VERSION "0.2")
 PROJECT(attoxml)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
@@ -19,18 +19,28 @@ SET(lib_srcs
     attoxml.cpp
 )
 
-SET(EXTRA_DIST CMakeLists.txt LICENSE.txt)
+SET(EXTRA_DIST CMakeLists.txt LICENSE.txt README.txt example.cpp)
 
 
 ADD_LIBRARY(attoxml STATIC ${lib_hdrs} ${lib_srcs})
 
-ADD_EXECUTABLE(demo ${lib_hdrs} ${lib_srcs})
-SET_TARGET_PROPERTIES(demo
-    PROPERTIES COMPILE_FLAGS "-DATTO_DEMO_MAIN")
+ADD_EXECUTABLE(attodemo ${lib_hdrs} ${lib_srcs} example.cpp)
 
 
-ADD_CUSTOM_TARGET(dist
-    COMMAND ${CMAKE_COMMAND} -E tar zcf attoxml-${ATTO_VERSION}.tgz
-            ${lib_hdrs} ${lib_srcs} ${EXTRA_DIST})
+IF(UNIX)
+    ADD_CUSTOM_TARGET(dist
+        COMMAND mkdir -p attoxml-${ATTO_VERSION}
+        COMMAND cp -p ${lib_hdrs} ${lib_srcs} ${EXTRA_DIST}
+                attoxml-${ATTO_VERSION}/
+        COMMAND tar -zcf attoxml-${ATTO_VERSION}.tgz
+                attoxml-${ATTO_VERSION}
+        COMMAND rm -rf attoxml-${ATTO_VERSION}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+ELSE(UNIX)
+    ADD_CUSTOM_TARGET(dist
+        COMMAND ${CMAKE_COMMAND} -E tar zcf attoxml-${ATTO_VERSION}.tgz
+                ${lib_hdrs} ${lib_srcs} ${EXTRA_DIST}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+ENDIF(UNIX)
 
 # vim: set ts=4 sw=4 et:
