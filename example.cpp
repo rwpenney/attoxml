@@ -107,7 +107,12 @@ int main(int argc, char *argv[])
     nd2->AddAttribute("attribute3", 1<<30);
     nd2->AppendChild("beta_0_0");
     nd2 = doc.AppendChild("Gamma");
-    nd2->AppendText("Rainfall in Spain favours small gradients");
+    nd2->AppendText(StringBuilder("Rainfall in Spain")
+                    << " favours gradients"
+                    << " less than " << 13 << "%");
+
+    nd0 = doc.AppendNamedText("Finale", "Thats all folks");
+    nd0->AddAttribute("type", "Grand");
 
     // Now that the element tree has been fully populated,
     // pretty-print it to the standard output:

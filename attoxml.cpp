@@ -4,7 +4,7 @@
  */
 
 /*
- *   Copyright 2012 RW Penney <rwpenney@users.sourceforge.net>
+ *   Copyright 2012-2013 RW Penney <rwpenney@users.sourceforge.net>
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -136,9 +136,19 @@ Node *Node::AppendChild(const std::string &name_)
 }
 
 
+/*!
+ *  Add a pure-text child element to this node.
+ */
 void Node::AppendText(const std::string &txt)
 {
     children.push_back(new TextNode(txt));
+}
+
+
+Node *Node::AppendNamedText(const std::string &child,
+                            const StringBuilder &strm)
+{
+    return AppendNamedText(child, (std::string)strm);
 }
 
 
@@ -198,6 +208,7 @@ void Node::Output(std::ostream &strm, const std::string &indent,
 TextNode::TextNode(const std::string &content_)
     : BareNode("TEXT"), content(content_)
 {
+    // Nothing else
 }
 
 
@@ -251,5 +262,15 @@ void Document::Print(std::ostream &strm, const std::string &indent)
 
     Output(strm, "", indent);
 }
+
+
+std::stringstream &Document::freshAttrStream()
+{
+    attrStrm.clear();
+    attrStrm.str("");
+
+    return attrStrm;
+}
+
 
 }   // namespace attoxml

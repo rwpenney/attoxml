@@ -7,7 +7,7 @@
 #define _ATTOXML_H
 
 /*
- *   Copyright 2012 RW Penney <rwpenney@users.sourceforge.net>
+ *   Copyright 2012-2013 RW Penney <rwpenney@users.sourceforge.net>
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 namespace attoxml {
 
 class Document;
+class StringBuilder;
 
 
 /*!
@@ -98,13 +99,17 @@ class Node : public BareNode
 
     public:
         template <typename VAL_T>
-        void AddAttribute(const std::string &name, const VAL_T &value);
-        void AddAttribute(const std::string &name, const char *value);
+        void AddAttribute(const std::string &attr, const VAL_T &value);
+        void AddAttribute(const std::string &attr, const char *value);
 
-        Node *PrependChild(const std::string &name_);
-        Node *AppendChild(const std::string &name_);
+        Node *PrependChild(const std::string &child);
+        Node *AppendChild(const std::string &child);
 
         void AppendText(const std::string &txt);
+        template <typename VAL_T>
+        Node *AppendNamedText(const std::string &child, const VAL_T &text);
+        Node *AppendNamedText(const std::string &child,
+                              const StringBuilder &strm);
 
         void Output(std::ostream &strm, const std::string &indent,
                     const std::string &indentStep) const;
@@ -161,6 +166,8 @@ class Document : public Node
         //! within Node::AddAttribute()
         std::stringstream attrStrm;
 
+        std::stringstream &freshAttrStream();
+
         //! Nominal width of page allowed for each line of attributes
         size_t attrWidth;
 
@@ -172,14 +179,64 @@ class Document : public Node
 };
 
 
-template <typename VAL_T>
-void Node::AddAttribute(const std::string &name, const VAL_T &value)
+/*!
+ *  Stream-like class for building textual nodes
+ *  via syntax like:
+ *  \code
+ *  node->AppendText(StringBuilder("Pi is poorly approximated by "
+ *                                  << 22 / 7.0));
+ *  \endcode
+ */
+class StringBuilder
 {
-    theDoc->attrStrm.clear();
-    theDoc->attrStrm.str("");
+  public:
+    StringBuilder(const std::string &root="") {
+      strm << root; }
+    StringBuilder(const StringBuilder &other)
+      : strm(other.strm.str()) {}
+    StringBuilder &operator=(const StringBuilder &other) {
+      strm.str(other.strm.str());
+      return *this; }
+    ~StringBuilder() {}
 
-    theDoc->attrStrm << value;
-    attributes.push_back(Attribute(name, theDoc->attrStrm.str()));
+    template <typename T>
+    StringBuilder &operator<<(const T &chunk) {
+      strm << chunk;
+      return *this; }
+
+    operator std::string() const {
+      return strm.str(); }
+
+  protected:
+    std::stringstream strm;
+};
+
+
+/*!
+ *  Add an attribute to the current element,
+ *  automatically converting the supplied value to a string.
+ */
+template <typename VAL_T>
+void Node::AddAttribute(const std::string &attr, const VAL_T &value)
+{   std::stringstream &strm = theDoc->freshAttrStream();
+
+    strm << value;
+    attributes.push_back(Attribute(attr, strm.str()));
+}
+
+
+/*!
+ *  Add a child element, and populate that child with a pure-text child.
+ */
+template <typename VAL_T>
+Node *Node::AppendNamedText(const std::string &child, const VAL_T &text)
+{   Node *childElt = AppendChild(child);
+    std::stringstream &strm = theDoc->freshAttrStream();
+
+    strm << text;
+    childElt->AppendText(strm.str());
+
+    return childElt;
 }
 
 }   // namespace attoxml

@@ -2,7 +2,7 @@
 # RW Penney, May 2012
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-SET(ATTO_VERSION "0.2")
+SET(ATTO_VERSION "0.2.1")
 PROJECT(attoxml)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
@@ -42,5 +42,3 @@ ELSE(UNIX)
                 ${lib_hdrs} ${lib_srcs} ${EXTRA_DIST}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 ENDIF(UNIX)
-
-# vim: set ts=4 sw=4 et:
