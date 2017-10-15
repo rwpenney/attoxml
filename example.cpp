@@ -4,7 +4,7 @@
  */
 
 /*
- *   Copyright 2012 RW Penney <rwpenney@users.sourceforge.net>
+ *   Copyright 2012-2017 RW Penney <rwpenney@users.sourceforge.net>
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ void randomDoc(std::ostream &strm, const size_t n_nodes=16)
     srand((unsigned)time(NULL) ^ 0xd44c8ba0u);
 
     theDoc = new Document("Random");
-    theDoc->SetDefaultNS("http://www.rwpenney.org.uk/schemas/attoxml");
+    theDoc->SetDefaultNS("http://www.rwpenney.uk/schemas/attoxml");
     allNodes[0] = theDoc;
 
     for (n=1; n<=n_nodes; ++n) {

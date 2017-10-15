@@ -1,0 +1,7 @@
+.*.swp
+attodemo
+CMakeCache.txt
+CMakeFiles/*
+cmake*.cmake
+libattoxml.*
+Makefile

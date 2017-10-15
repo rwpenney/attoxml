@@ -4,7 +4,7 @@
  */
 
 /*
- *   Copyright 2012-2013 RW Penney <rwpenney@users.sourceforge.net>
+ *   Copyright 2012-2017 RW Penney <rwpenney@users.sourceforge.net>
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -229,8 +229,10 @@ void TextNode::Output(std::ostream &strm, const std::string &name,
  */
 
 Document::Document(const std::string &root)
-    : Node(this, root)
+    : Node(NULL, root)
 {
+    theDoc = this;
+
     attrWidth = 40;
     nsDecl = NULL;
 }

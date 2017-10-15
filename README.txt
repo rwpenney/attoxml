@@ -17,6 +17,3 @@ Applications requiring fuller support for features such as XML ingest/parsing,
 schema validation, non-trivial normalization of textual content,
 should look towards one of the more heavy-weight XML libraries,
 such as (in no particular order): eXpat, libxml2, TinyXML, Xerces-C++, etc.
-
-Constructive comments and bug-fixes should be sent to the author:
-    rwpenney@users.sourceforge.net
