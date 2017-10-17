@@ -1,5 +1,7 @@
 .*.swp
 attodemo
+DoxyDocs/*
+doxygen.conf
 CMakeCache.txt
 CMakeFiles/*
 cmake*.cmake

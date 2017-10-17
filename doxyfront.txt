@@ -1,0 +1,47 @@
+/*
+ *  Doxygen title page for attoXML library
+ *  RW Penney, October 2017
+ */
+
+/*! \mainpage attoXML
+ *
+ *  attoXML is a simple C++ library for creating well-formed XML documents.
+ *  It is intended for applications which need to write-only support
+ *  for XML, but which require more robust guarantees about the layout
+ *  and syntactic validity than can be obtained from pure printf()
+ *  or iostream operations.
+ *
+ *  Example usage is as follows:
+ *  \code
+    attoxml::Document doc("RootNode");
+    doc.SetDefaultNS("http://my.namespace.com");
+
+    auto child0 = doc.AppendChild("ZerothChild");
+    child0->AddAttribute("parameter", 3.14159);
+
+    auto grandchild = child0->AppendChild("Grandchild");
+    grandchild->AppendText(attoxml::StringBuilder("Alpha")
+                            << ", beta"
+                            << ", gamma");
+
+    auto child1 = doc.AppendChild("FirstChild");
+
+    doc.Print(std::cout);
+ *  \endcode
+ *
+ *  This will generate the following XML document:
+ *  \code
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <RootNode xmlns="http://my.namespace.com">
+      <ZerothChild parameter="3.14159">
+        <Grandchild>Alpha, beta, gamma</Grandchild>
+      </ZerothChild>
+      <FirstChild/>
+    </RootNode>
+ *  \endcode
+ */
+
+//! @brief Package namespace
+namespace attoxml {}
+
+// vim: set ts=4 sw=4 et syntax=cpp:
