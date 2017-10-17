@@ -34,16 +34,14 @@ class Document;
 class StringBuilder;
 
 
-/*!
- *  Abstract representation of a data or text node
- *  within an XML document tree.
- */
+//! @brief  Abstract representation of a data or text node
+//!         within an XML document tree.
 class BareNode
 {
     public:
         BareNode(const std::string &name_);
         BareNode(const BareNode &other);
-        virtual ~BareNode();
+        virtual ~BareNode() {}
 
         //! Pretty-print this node (possibly recursively),
         //! using the given indentation level and increment.
@@ -63,9 +61,11 @@ class BareNode
 };
 
 
-/*!
- *  Representation of an attribute within an XML element,
- *  consisting of an identifier and value.
+/*! @brief  Representation of an attribute within an XML element,
+ *          consisting of an identifier and value.
+ *
+ *  Instances are typically not created directly,
+ *  but implicitly by calling Node::AddAttribute().
  */
 class Attribute
 {
@@ -73,7 +73,6 @@ class Attribute
         Attribute(const std::string &key_, const std::string &value_);
         Attribute(const Attribute &other);
         Attribute &operator=(const Attribute &other);
-        ~Attribute();
 
     protected:
         std::string key;
@@ -85,8 +84,8 @@ class Attribute
 };
 
 
-/*!
- *  An node element within an XML document.
+/*! @brief A node element within an XML document.
+ *
  *  This can be used as a container of child elements,
  *  including textual elements.
  *  Attributes associated with this node can be added via AddAttribute().
@@ -125,10 +124,8 @@ class Node : public BareNode
 };
 
 
-/*!
- *  Representation of a textual element within an XML document,
- *  typically used as a child of an ordinary Node.
- */
+//! @brief  Representation of a textual element within an XML document,
+//          typically used as a child of an ordinary Node.
 class TextNode : public BareNode
 {
     public:
@@ -146,10 +143,8 @@ class TextNode : public BareNode
 };
 
 
-/*!
- *  Representation of an entire XML document,
- *  identified by its root Node.
- */
+//! @brief  Representation of an entire XML document,
+//          identified by its root Node.
 class Document : public Node
 {
     public:
@@ -179,12 +174,15 @@ class Document : public Node
 };
 
 
-/*!
- *  Stream-like class for building textual nodes
- *  via syntax like:
+/*! @brief Stream-like class for building textual nodes
+ *
+ *  This allows shorthand syntax such as:
  *  \code
- *  node->AppendText(StringBuilder("Pi is poorly approximated by "
- *                                  << 22 / 7.0));
+ *  node->AppendText(StringBuilder("")
+ *                    << "Pi is poorly approximated by "
+ *                    << 22 << "/" << 7.0 << ". "
+ *                    << "A better approximation is "
+ *                    << 2 * std::asin(1));
  *  \endcode
  */
 class StringBuilder
@@ -204,6 +202,7 @@ class StringBuilder
       strm << chunk;
       return *this; }
 
+    //! @brief Extract the buffered text as a plain std::string
     operator std::string() const {
       return strm.str(); }
 
@@ -212,10 +211,8 @@ class StringBuilder
 };
 
 
-/*!
- *  Add an attribute to the current element,
- *  automatically converting the supplied value to a string.
- */
+//! @brief  Add an attribute to the current element,
+//!         automatically converting the supplied value to a string.
 template <typename VAL_T>
 void Node::AddAttribute(const std::string &attr, const VAL_T &value)
 {   std::stringstream &strm = theDoc->freshAttrStream();
@@ -225,9 +222,7 @@ void Node::AddAttribute(const std::string &attr, const VAL_T &value)
 }
 
 
-/*!
- *  Add a child element, and populate that child with a pure-text child.
- */
+//! @brief Add a child element, and populate that child with a pure-text child.
 template <typename VAL_T>
 Node *Node::AppendNamedText(const std::string &child, const VAL_T &text)
 {   Node *childElt = AppendChild(child);

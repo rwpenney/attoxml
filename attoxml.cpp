@@ -29,23 +29,10 @@ namespace attoxml {
  */
 
 BareNode::BareNode(const std::string &name_)
-    : name(name_)
-{
-    // Nothing else
-}
-
+    : name(name_) {}
 
 BareNode::BareNode(const BareNode &other)
-    : name(other.name)
-{
-    // Nothing else
-}
-
-
-BareNode::~BareNode()
-{
-    // Nothing
-}
+    : name(other.name) {}
 
 
 
@@ -79,21 +66,13 @@ Attribute &Attribute::operator=(const Attribute &other)
 }
 
 
-Attribute::~Attribute()
-{
-}
-
-
 
 /*
  *  ==== Node ====
  */
 
 Node::Node(Document *doc, const std::string &name_)
-    : BareNode(name_), theDoc(doc)
-{
-    // Nothing else
-}
+    : BareNode(name_), theDoc(doc) {}
 
 
 Node::~Node()
@@ -118,6 +97,7 @@ void Node::AddAttribute(const std::string &name, const char *value)
 }
 
 
+//! @brief Add a child element before any existing children
 Node *Node::PrependChild(const std::string &name_)
 {   Node *newnode = new Node(theDoc, name_);
 
@@ -127,6 +107,7 @@ Node *Node::PrependChild(const std::string &name_)
 }
 
 
+//! @brief Add a child element after any existing children
 Node *Node::AppendChild(const std::string &name_)
 {   Node *newnode = new Node(theDoc, name_);
 
@@ -136,8 +117,9 @@ Node *Node::AppendChild(const std::string &name_)
 }
 
 
-/*!
- *  Add a pure-text child element to this node.
+/*! @brief Add a pure-text child element to this node.
+ *
+ *  \see StringBuilder.
  */
 void Node::AppendText(const std::string &txt)
 {
@@ -152,8 +134,12 @@ Node *Node::AppendNamedText(const std::string &child,
 }
 
 
-/*!
- *  Recursively pretty-print this element and its children.
+/*! @brief Recursively pretty-print this element and its children.
+ *
+ *  @param strm         The output stream.
+ *  @param indent       The initial level of indentation.
+ *  @param indentStep   The additional indentation to apply
+ *                      for immediate children.
  */
 void Node::Output(std::ostream &strm, const std::string &indent,
                     const std::string &indentStep) const
@@ -266,6 +252,7 @@ void Document::Print(std::ostream &strm, const std::string &indent)
 }
 
 
+//! @brief Refresh the internal buffer used for collating XML attributes
 std::stringstream &Document::freshAttrStream()
 {
     attrStrm.clear();

@@ -2,7 +2,7 @@
 # RW Penney, May 2012
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-SET(ATTO_VERSION "0.2.3")
+SET(ATTO_VERSION "0.2.4")
 PROJECT(attoxml)
 
 IF(CMAKE_COMPILER_IS_GNUCC)
@@ -32,7 +32,8 @@ SET(lib_srcs
 SET(EXTRA_DIST CMakeLists.txt LICENSE.txt README.txt example.cpp)
 
 
-ADD_LIBRARY(attoxml STATIC ${lib_hdrs} ${lib_srcs})
+ADD_LIBRARY(attoxml SHARED ${lib_hdrs} ${lib_srcs})
+SET_TARGET_PROPERTIES(attoxml PROPERTIES SOVERSION "${ATTO_VERSION}")
 
 ADD_EXECUTABLE(attodemo ${lib_hdrs} ${lib_srcs} example.cpp)
 
