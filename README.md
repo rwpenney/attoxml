@@ -32,30 +32,30 @@ such as (in no particular order):
 With a recent (C++11) compiler, one can use a recipe such as:
 
 ```cpp
-    attoxml::Document doc("RootNode");
-    doc.SetDefaultNS("http://my.namespace.com");
+attoxml::Document doc("RootNode");
+doc.SetDefaultNS("http://my.namespace.com");
 
-    auto child0 = doc.AppendChild("ZerothChild");
-    child0->AddAttribute("parameter", 3.14159);
+auto child0 = doc.AppendChild("ZerothChild");
+child0->AddAttribute("parameter", 3.14159);
 
-    auto grandchild = child0->AppendChild("Grandchild");
-    grandchild->AppendText(attoxml::StringBuilder("Alpha")
-                            << ", beta"
-                            << ", gamma");
+auto grandchild = child0->AppendChild("Grandchild");
+grandchild->AppendText(attoxml::StringBuilder("Alpha")
+                        << ", beta"
+                        << ", gamma");
 
-    auto child1 = doc.AppendChild("FirstChild");
+auto child1 = doc.AppendChild("FirstChild");
 
-    doc.Print(std::cout);
+doc.Print(std::cout);
 ```
 
 to construct an XML document of the form:
 
 ```xml
-    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <RootNode xmlns="http://my.namespace.com">
-      <ZerothChild parameter="3.14159">
-        <Grandchild>Alpha, beta, gamma</Grandchild>
-      </ZerothChild>
-      <FirstChild/>
-    </RootNode>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RootNode xmlns="http://my.namespace.com">
+  <ZerothChild parameter="3.14159">
+    <Grandchild>Alpha, beta, gamma</Grandchild>
+  </ZerothChild>
+  <FirstChild/>
+</RootNode>
 ```
